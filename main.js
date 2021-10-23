@@ -1,7 +1,4 @@
 const {Client, Intents,Constants} = require("discord.js")
-const dotenv = require('dotenv');
-dotenv.config();
-
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 const Pomo = require("./pomo")
 
@@ -79,9 +76,9 @@ client.on('interactionCreate', async (interaction) => {
         const longbreak = options.getNumber("longbreak") || 10
         const sessions = options.getNumber("sessions") || 4
 
-        Pomos[`${interaction.guild} ${interaction.channelId}`] = new Pomo(interaction.guild,interaction.channelId,work,shortbreak,longbreak,sessions,interaction.channel)
+        Pomos[`${interaction.guildId} ${interaction.channelId}`] = new Pomo(interaction.guildId,interaction.channelId,work,shortbreak,longbreak,sessions,interaction.channel)
         
-        Pomos[`${interaction.guild} ${interaction.channelId}`].start()
+        Pomos[`${interaction.guildId} ${interaction.channelId}`].start()
 
         interaction.reply({
             content: `Pomodoro Has Started`,
@@ -89,8 +86,8 @@ client.on('interactionCreate', async (interaction) => {
         })
     } 
     else if (commandName === 'stop'){
-        Pomos[`${interaction.guild} ${interaction.channelId}`].stop()
-        delete Pomos[`${interaction.guild} ${interaction.channelId}`]
+        Pomos[`${interaction.guildId} ${interaction.channelId}`].stop()
+        delete Pomos[`${interaction.guildId} ${interaction.channelId}`]
         interaction.reply({
             content: `Pomodoro Has been canceled`,
             ephemeral: false,
@@ -98,9 +95,9 @@ client.on('interactionCreate', async (interaction) => {
     }
     else if (commandName === 'status'){
 
-        if (Pomos.hasOwnProperty(`${interaction.guild} ${interaction.channelId}`) === true){
+        if (Pomos.hasOwnProperty(`${interaction.guildId} ${interaction.channelId}`) === true){
             interaction.reply({
-                content: `${Pomos[`${interaction.guild} ${interaction.channelId}`].getStatus()}`,
+                content: `${Pomos[`${interaction.guildId} ${interaction.channelId}`].getStatus()}`,
                 ephemeral: false,
             })
         }else{
