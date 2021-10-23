@@ -2,6 +2,7 @@ const {Client, Intents,Constants} = require("discord.js")
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 const Pomo = require("./pomo")
 const dotenv = require('dotenv');
+const wait = require('util').promisify(setTimeout);
 dotenv.config();
 
 var Pomos = {}
@@ -94,6 +95,7 @@ client.on('interactionCreate', async (interaction) => {
             content: `Pomodoro Has been canceled`,
             ephemeral: false,
         })
+        interaction.channel.send()
     }
     else if (commandName === 'status'){
 
@@ -112,5 +114,26 @@ client.on('interactionCreate', async (interaction) => {
        
     }
 })
+
+client.on('interactionCreate', async interaction => {
+    if(interaction.customId === "StartNextPomodoro"){
+        await interaction.deferReply();
+        interaction.editReply("Next pomodoro starts in")
+        await wait(1000);
+        interaction.editReply("3")
+        await wait(1000);
+        interaction.editReply("2")
+        await wait(1000);
+        interaction.editReply("1")
+        await wait(1000);
+        await interaction.editReply({
+            content: `Here we go!`,
+            ephemeral: false,
+        
+        })
+        Pomos[`${interaction.guildId} ${interaction.channelId}`].startNextPomodoroButton()
+        console.log("%s-%s: %s",interaction.guild,interaction.channelId,"Next Pomodoro button was pressed!")
+      }
+});
 
 client.login(process.env.TOKEN)

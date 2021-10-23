@@ -17,14 +17,16 @@ class Pomo {
 
         this.interval = null
         this.tick = 1000
+        this.tick_frequency = 1
         this.sessions_remaining =  this.sessions
         this.mode = 1
         this.count = 0
+        this.halting = false
     }
 
     dateCreator(sessionTime){
         var dateObj =  Date.now()
-        dateObj += sessionTime*this.tick*60;
+        dateObj += sessionTime*this.tick*this.tick_frequency;
         return new Date(dateObj)
      }
 
@@ -73,7 +75,10 @@ class Pomo {
     }
 
     doWork(){
-        var count_in_min = Math.floor(this.count / 60)
+        if (this.halting)
+            return
+
+        var count_in_min = Math.floor(this.count / this.tick_frequency)
         if (count_in_min == this.work && this.sessions_remaining > 0 && this.mode == 1)
         {
             this.pomodoro_counter++
@@ -94,6 +99,7 @@ class Pomo {
             this.mode = 3
             this.count = 0 
         } else if (count_in_min == this.shortBreak && this.mode == 2 ) {
+            this.halting = true
             const StartNextButton = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
@@ -102,14 +108,10 @@ class Pomo {
                     .setStyle('SUCCESS')
                 );  
         
-            await this.channel.reply({ content: 'Start the next pomodoro!', components: [StartNextButton] });
-            this.session_time = this.dateCreator(this.work)
-            this.session_status = "Work session is in progress!"
-            this.log(this.session_status)
-            this.channel.send(`Short break session ended! Work starts now!!\n${this.getStatus()}`)
-            this.mode = 1
-            this.count = 0 
+            this.channel.send({ content: 'Start the next pomodoro!', components: [StartNextButton] });
+
         } else if (count_in_min == this.longBreak && this.mode == 3) {
+            this.halting = true
             const StartNextButton = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
@@ -118,13 +120,8 @@ class Pomo {
                     .setStyle('SUCCESS')
                 );  
         
-            await this.channel.reply({ content: 'Start the next pomodoro!', components: [StartNextButton] });
-            this.session_time = this.dateCreator(this.work)
-            this.session_status = "Work session is in progress!"
-            this.log(this.session_status)
-            this.channel.send(`Long break session ended! Work starts now!!\n\n${this.getStatus()}`)
-            this.mode = 1
-            this.count = 0 
+            this.channel.send({ content: 'Start the next pomodoro!', components: [StartNextButton] });
+
         }
         this.count++;
     }
@@ -132,6 +129,26 @@ class Pomo {
     stop(){
         this.log("PomPom has stopped")
         clearInterval(this.interval)
+    }
+
+    startNextPomodoroButton(){
+        if (this.mode === 2){
+            this.session_time = this.dateCreator(this.work)
+            this.session_status = "Work session is in progress!"
+            this.log(this.session_status)
+            this.channel.send(`Short break session ended! Work starts now!!\n${this.getStatus()}`)
+            this.mode = 1
+            this.count = 0 
+            this.halting = false
+        }else if (this.mode === 3){
+            this.session_time = this.dateCreator(this.work)
+            this.session_status = "Work session is in progress!"
+            this.log(this.session_status)
+            this.channel.send(`Long break session ended! Work starts now!!\n\n${this.getStatus()}`)
+            this.mode = 1
+            this.count = 0 
+            this.halting = false
+        }
     }
 }
 
