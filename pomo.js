@@ -1,3 +1,5 @@
+const { MessageActionRow, MessageButton } = require('discord.js');
+
 class Pomo {
     constructor(guildId,channelId,work,shortBreak,longBreak,sessions,channel) {
 
@@ -92,6 +94,15 @@ class Pomo {
             this.mode = 3
             this.count = 0 
         } else if (count_in_min == this.shortBreak && this.mode == 2 ) {
+            const StartNextButton = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                    .setCustomId('StartNextPomodoro')
+                    .setLabel('Start')
+                    .setStyle('SUCCESS')
+                );  
+        
+            await this.channel.reply({ content: 'Start the next pomodoro!', components: [StartNextButton] });
             this.session_time = this.dateCreator(this.work)
             this.session_status = "Work session is in progress!"
             this.log(this.session_status)
@@ -99,6 +110,15 @@ class Pomo {
             this.mode = 1
             this.count = 0 
         } else if (count_in_min == this.longBreak && this.mode == 3) {
+            const StartNextButton = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                    .setCustomId('StartNextPomodoro')
+                    .setLabel('Start')
+                    .setStyle('SUCCESS')
+                );  
+        
+            await this.channel.reply({ content: 'Start the next pomodoro!', components: [StartNextButton] });
             this.session_time = this.dateCreator(this.work)
             this.session_status = "Work session is in progress!"
             this.log(this.session_status)
