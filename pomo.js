@@ -17,7 +17,7 @@ class Pomo {
 
         this.interval = null
         this.tick = 1000
-        this.tick_frequency = 1
+        this.tick_frequency = 60
         this.sessions_remaining =  this.sessions
         this.mode = 1
         this.count = 0
