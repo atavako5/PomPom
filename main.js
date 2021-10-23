@@ -1,6 +1,8 @@
 const {Client, Intents,Constants} = require("discord.js")
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 const Pomo = require("./pomo")
+const dotenv = require('dotenv');
+dotenv.config();
 
 var Pomos = {}
 
