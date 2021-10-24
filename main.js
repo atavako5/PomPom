@@ -23,18 +23,21 @@ client.once('ready', ()=> {
 
     commands?.create({
         name: 'status',
+        customId:'status',
         description: 'replies with the current status of the pomodoro',
         ephemeral: false
     });
 
     commands?.create({
         name: 'stop',
+        customId:'stop',
         description: 'stops the current pomodoro',
         ephemeral: false
     });    
 
     commands?.create({
         name: 'start',
+        customId:'start',
         description: 'starts the pomodoro',
         ephemeral: false,
         options:[
@@ -79,6 +82,16 @@ client.on('interactionCreate', async (interaction) => {
         const longbreak = options.getNumber("longbreak") || 10
         const sessions = options.getNumber("sessions") || 4
 
+
+        if ( parseInt(work) !== work || parseInt(shortbreak) !== shortbreak || parseInt(longbreak) !== longbreak || parseInt(sessions) !== sessions){
+            interaction.reply({
+                content: `Pom Pom doesn't like factions, please use whole numbers...`,
+                ephemeral: false,
+            })
+            return
+        }
+       
+
         Pomos[`${interaction.guildId} ${interaction.channelId}`] = new Pomo(interaction.guildId,interaction.channelId,work,shortbreak,longbreak,sessions,interaction.channel)
         
         Pomos[`${interaction.guildId} ${interaction.channelId}`].start()
@@ -95,7 +108,6 @@ client.on('interactionCreate', async (interaction) => {
             content: `Pomodoro Has been canceled`,
             ephemeral: false,
         })
-        interaction.channel.send()
     }
     else if (commandName === 'status'){
 
