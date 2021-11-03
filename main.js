@@ -1,5 +1,5 @@
 const {Client, Intents,Constants} = require("discord.js")
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
+const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 const Pomo = require("./pomo")
 const dotenv = require('dotenv');
 const wait = require('util').promisify(setTimeout);
@@ -25,7 +25,7 @@ client.once('ready', ()=> {
         name: 'status',
         customId:'status',
         description: 'replies with the current status of the pomodoro',
-        ephemeral: false
+        ephemeral: true
     });
 
     commands?.create({
@@ -114,12 +114,12 @@ client.on('interactionCreate', async (interaction) => {
         if (Pomos.hasOwnProperty(`${interaction.guildId} ${interaction.channelId}`) === true){
             interaction.reply({
                 content: `${Pomos[`${interaction.guildId} ${interaction.channelId}`].getStatus()}`,
-                ephemeral: false,
+                ephemeral: true,
             })
         }else{
             interaction.reply({
                 content: `A pomodoro is not running, try starting one by typing /start`,
-                ephemeral: false,
+                ephemeral: true,
             })
         }
 

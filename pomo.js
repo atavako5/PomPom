@@ -79,7 +79,7 @@ class Pomo {
             return
 
         var count_in_min = Math.floor(this.count / this.tick_frequency)
-        if (count_in_min == this.work && this.sessions_remaining > 0 && this.mode == 1)
+        if (count_in_min == this.work && this.sessions_remaining > 1 && this.mode == 1)
         {
             this.pomodoro_counter++
             this.session_time = this.dateCreator(this.shortBreak)
@@ -89,7 +89,7 @@ class Pomo {
             this.sessions_remaining--
             this.mode = 2
             this.count = 0 
-        }else if (count_in_min == this.work && this.sessions_remaining == 0 && this.mode == 1){
+        }else if (count_in_min == this.work && this.sessions_remaining == 1 && this.mode == 1){
             this.pomodoro_counter++
             this.session_time = this.dateCreator(this.longBreak)
             this.session_status = "Long break session is in progress!"
