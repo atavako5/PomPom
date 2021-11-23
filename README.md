@@ -1,5 +1,5 @@
 # PomPom
-I'd checked out all the other pomodoro bots on this server and I wasn't happy with any of them. They either lacked something or the other. So I decided to make my own.
+I'd checked out all the other pomodoro bots on top.gg and I wasn't happy with any of them. They either lacked something or the other. So I decided to make my own.
 
 PomPom is a real-time Pomodoro app with slash commands. It's highly customizable, please be aware that this is a very early prototype and I would appreciate any help I could get in terms of development. The source code is on GitHub: https://github.com/atavako5/PomPom/issues Don't be scared, it's literally only 2 JS files and it runs on the latest version of NodeJS.
 
@@ -24,3 +24,6 @@ stops the current running Pomodoro
 
 /status
 get the status of the current running Pomodoro
+
+Feature progress:
+https://trello.com/b/dRwS0fJF/pompom
