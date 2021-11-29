@@ -19,16 +19,20 @@ sessions: How many short sessions do you want to go to before long break (Defaul
 
 Note you can put fractions in any of these fields, PomPom doesn't like it. (like 0.25 min). Although with enough requests, I may be able to change PomPom's mind 😉
 
-/stop
+/stop:
+
 stops the current running Pomodoro
 
-/status
+/status:
+
 get the status of the current running Pomodoro
 
-/pause
+/pause:
+
 pauses the current session and saves progress to db
 
-/unpause
+/unpause:
+
 unpauses the current session
 
 There is a persistance layer on this bot, if I ever restart the server from Nov 28th, 2021, you will not lose progress and it will automatically restore your sessions. As a bonus you now have access to how many pomodoros you have gone through.
