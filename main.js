@@ -1,31 +1,94 @@
 const {Client, Intents,Constants} = require("discord.js")
 const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 const Pomo = require("./pomo")
+
 const dotenv = require('dotenv');
-const wait = require('util').promisify(setTimeout);
 dotenv.config();
+
+const wait = require('util').promisify(setTimeout);
+
+
+var Logger = require('./logger');
+var logger = new Logger().getInstance()
+
+const userSchema = require('./userSchema')
+const mongoose = require('mongoose');
+main().catch(err => logger.info(err));
+
+async function main() {
+    await mongoose.connect(process.env.MONGO_URL);
+}
+
+
+const User = mongoose.model('PomPom-User', userSchema);
+
 
 var Pomos = {}
 
-client.once('ready', ()=> {
-    console.log("PomPom is ready!");
+client.once('ready', async ()=> {
+    logger.info("PomPom is ready!");
     const guildId = process.env.GUILD_ID
     const guild = client.guilds.cache.get(guildId)
     let commands
-
     if (guild){
-        console.log("building guild commands")
+        logger.info("Built guild commands")
         commands = guild.commands;
     }else{
-        console.log("building global commands")
+        logger.info("Built global commands")
         commands = client.application?.commands
     }
+    const cursor = User.find({}).cursor();
+
+    for (let user = await cursor.next(); user != null; user = await cursor.next()) {
+        var channel = client.channels.cache.get(user._id)
+        Pomos[`${user._id}`] = new Pomo(
+            user._id,
+            user.work,
+            user.short_break,
+            user.long_break,
+            user.sessions,
+            channel,
+            user.pausable,
+            User,
+            user.paused,
+            user.paused_time,
+            user.paused_tick,
+            user.stopped,
+            user.session_status,
+            user.session_time,
+            user.pomodoro_counter,
+            user.total_pomodoros,
+            undefined,
+            user.tick,
+            user.count_in_min,
+            user.session_time_raw,
+            user.sessions_remaining,
+            user.mode,
+            user.count
+            )
+            Pomos[`${user._id}`].restore()
+    }
+
 
     commands?.create({
         name: 'status',
         customId:'status',
         description: 'replies with the current status of the pomodoro',
         ephemeral: true
+    });
+
+    commands?.create({
+        name: 'pause',
+        customId:'pause',
+        description: 'pauses the current pomodoro (if pausable)',
+        ephemeral: false
+    });
+
+    commands?.create({
+        name: 'unpause',
+        customId:'unpause',
+        description: 'unpauses the current pomodoro',
+        ephemeral: false
     });
 
     commands?.create({
@@ -64,7 +127,13 @@ client.once('ready', ()=> {
                 description: 'How many short sesssions do you want to go before long break (Default is 4, long break on 4th)',
                 required: false,
                 type: Constants.ApplicationCommandOptionTypes.NUMBER
-            }
+            },
+            {
+                name: 'pausable',
+                description: 'Should you be able to pause this pomodor (defaulse to false)',
+                required: false,
+                type: Constants.ApplicationCommandOptionTypes.BOOLEAN
+            },
         ]
     })
 })
@@ -81,7 +150,7 @@ client.on('interactionCreate', async (interaction) => {
         const shortbreak = options.getNumber("shortbreak") || 5
         const longbreak = options.getNumber("longbreak") || 10
         const sessions = options.getNumber("sessions") || 4
-
+        const pausable = options.getBoolean("pausable") || false
 
         if ( parseInt(work) !== work || parseInt(shortbreak) !== shortbreak || parseInt(longbreak) !== longbreak || parseInt(sessions) !== sessions){
             interaction.reply({
@@ -91,10 +160,18 @@ client.on('interactionCreate', async (interaction) => {
             return
         }
        
-
-        Pomos[`${interaction.guildId} ${interaction.channelId}`] = new Pomo(interaction.guildId,interaction.channelId,work,shortbreak,longbreak,sessions,interaction.channel)
+        if (Pomos.hasOwnProperty(`${interaction.channelId}`) === false)
+            Pomos[`${interaction.channelId}`] = new Pomo(
+                interaction.channelId,
+                work,
+                shortbreak,
+                longbreak,
+                sessions,
+                interaction.channel,
+                pausable,
+                User)
         
-        Pomos[`${interaction.guildId} ${interaction.channelId}`].start()
+        Pomos[`${interaction.channelId}`].start()
 
         interaction.reply({
             content: `Pomodoro Has Started`,
@@ -102,8 +179,8 @@ client.on('interactionCreate', async (interaction) => {
         })
     } 
     else if (commandName === 'stop'){
-        Pomos[`${interaction.guildId} ${interaction.channelId}`].stop()
-        delete Pomos[`${interaction.guildId} ${interaction.channelId}`]
+        Pomos[`${interaction.channelId}`].stop()
+        delete Pomos[`${interaction.channelId}`]
         interaction.reply({
             content: `Pomodoro Has been canceled`,
             ephemeral: false,
@@ -111,24 +188,82 @@ client.on('interactionCreate', async (interaction) => {
     }
     else if (commandName === 'status'){
 
-        if (Pomos.hasOwnProperty(`${interaction.guildId} ${interaction.channelId}`) === true){
+        if (Pomos.hasOwnProperty(`${interaction.channelId}`) === true && Pomos[`${interaction.channelId}`].stopped === false){
             interaction.reply({
-                content: `${Pomos[`${interaction.guildId} ${interaction.channelId}`].getStatus()}`,
+                content: `${Pomos[`${interaction.channelId}`].getStatus()}`,
                 ephemeral: true,
             })
+        }else{
+            User.findById(interaction.channelId, (err,user)=>{
+                if (!err && user){
+                    interaction.reply({
+                        content: `A pomodoro is not running, try starting one by typing /start\nThis channel has done ${user.total_pomodoros} pomodoros so far!`,
+                        ephemeral: true,
+                    })
+                }else{
+                    interaction.reply({
+                        content: `A pomodoro is not running, try starting one by typing /start`,
+                        ephemeral: true,
+                    })
+                }
+            })
+
+        }
+
+       
+    }
+    else if (commandName === 'pause'){
+
+        if (Pomos.hasOwnProperty(`${interaction.channelId}`) === true){
+
+            if (Pomos[`${interaction.channelId}`].pausable === true){
+                Pomos[`${interaction.channelId}`].pause()
+                interaction.reply({
+                    content: `You paused the pomodoro`,
+                    ephemeral: false,
+                })
+            }else{
+                interaction.reply({
+                    content: `Current running pomodoro is not pausable`,
+                    ephemeral: true,
+                })                
+            }
+           
         }else{
             interaction.reply({
                 content: `A pomodoro is not running, try starting one by typing /start`,
                 ephemeral: true,
             })
-        }
+        } 
+    }
+    else if (commandName === 'unpause'){
 
-       
+        if (Pomos.hasOwnProperty(`${interaction.channelId}`) === true){
+
+            if (Pomos[`${interaction.channelId}`].paused === true){
+                Pomos[`${interaction.channelId}`].unpause()
+                interaction.reply({
+                    content: `You have unpaused the pomodoro`,
+                    ephemeral: false,
+                })
+            }else{
+                interaction.reply({
+                    content: `Current running pomodoro is not paused`,
+                    ephemeral: true,
+                })                
+            }
+           
+        }else{
+            interaction.reply({
+                content: `A pomodoro is not running, try starting one by typing /start`,
+                ephemeral: true,
+            })
+        } 
     }
 })
 
 client.on('interactionCreate', async interaction => {
-    if(interaction.customId === "StartNextPomodoro"){
+    if(interaction.customId === "StartNextPomodoro" && Pomos.hasOwnProperty(`${interaction.channelId}`)){
         await interaction.deferReply();
         interaction.editReply("Next pomodoro starts in")
         await wait(1000);
@@ -143,8 +278,16 @@ client.on('interactionCreate', async interaction => {
             ephemeral: false,
         
         })
-        Pomos[`${interaction.guildId} ${interaction.channelId}`].startNextPomodoroButton()
-        console.log("%s-%s: %s",interaction.guild,interaction.channelId,"Next Pomodoro button was pressed!")
+    
+        Pomos[`${interaction.channelId}`].startNextPomodoroButton()
+      }else if (interaction.customId === "StartNextPomodoro") {
+        interaction.reply({
+            content: `Something went wrong, can't find your session, please start a new pomodoro session by using /start`,
+            ephemeral: false,
+        
+        })
+    
+        logger.info(`Could not find pomodoro sesssion for ${interaction.channelId}`)
       }
 });
 
