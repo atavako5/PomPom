@@ -35,7 +35,7 @@ pauses the current session and saves progress to db
 
 unpauses the current session
 
-There is a persistance layer on this bot, if I ever restart the server from Nov 28th, 2021, you will not lose progress and it will automatically restore your sessions. As a bonus you now have access to how many pomodoros you have gone through.
+There is a persistance layer on this bot, if I ever restart the server from Nov 28th, 2021, you will not lose progress and it will automatically restore your sessions. As a bonus you now have access to how many pomodoros you have gone through per channel.
 
 Future update:
 - Add total time spent per session
