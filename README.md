@@ -25,5 +25,17 @@ stops the current running Pomodoro
 /status
 get the status of the current running Pomodoro
 
+/pause
+pauses the current session and saves progress to db
+
+/unpause
+unpauses the current session
+
+There is a persistance layer on this bot, if I ever restart the server from Nov 28th, 2021, you will not lose progress and it will automatically restore your sessions. As a bonus you now have access to how many pomodoros you have gone through.
+
+Future update:
+- Add total time spent per session
+- add total time for all sessions in a channel
+
 Feature progress:
 https://trello.com/b/dRwS0fJF/pompom
