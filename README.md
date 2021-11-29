@@ -17,6 +17,8 @@ longbreak: How long should the long breaks be (in minutes, defaults to 3X short 
 
 sessions: How many short sessions do you want to go to before long break (Default is 4, long break on 4th)
 
+pausable: add the ability for the session to be pausable, turned off by default
+
 Note you can put fractions in any of these fields, PomPom doesn't like it. (like 0.25 min). Although with enough requests, I may be able to change PomPom's mind 😉
 
 /stop:
