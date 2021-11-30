@@ -1,12 +1,7 @@
 var Logger = require('./logger');
 const dotenv = require('dotenv');
-var moment = require('moment');
 
 dotenv.config();
-
-
-var MongoClient = require('mongodb').MongoClient;
-var url = process.env.MONGO_URL
 
 const { MessageActionRow, MessageButton } = require('discord.js');
 
