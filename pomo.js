@@ -66,9 +66,13 @@ class Pomo {
         this.User = User
         this.MyUser = null
 
-
+        console.log(sessions_remaining)
         // session
-        if (sessions_remaining == 0){
+        if (this.sessions  == undefined || this.sessions  == "undefined" || !this.sessions   ){
+            this.sessions = 4
+        }
+
+        if (sessions_remaining == undefined || sessions_remaining == "undefined" || !sessions_remaining  ){
             this.sessions_remaining = this.sessions
         }else{
             this.sessions_remaining = sessions_remaining
@@ -204,6 +208,7 @@ sessions remaining until long break: ${this.sessions_remaining}
     start()
     {   
         this.stopped = false
+        this.paused = false
         this.session_status = "Work session is in progress!"
         this.session_time =  this.dateCreator(this.work)
         this.log(this.session_status)
@@ -238,7 +243,8 @@ sessions remaining until long break: ${this.sessions_remaining}
     doWork(){
         try{
             this.count_in_min = Math.floor(this.count / this.tick_frequency)
-           console.log(this.count_in_min, this.sessions_remaining,this.mode,this.session_time )
+            
+           this.log(`${this.count_in_min}, ${this.count}, ${this.sessions}, ${this.sessions_remaining}, ${this.mode,this.session_time}, ${this.mode}, ${this.tick_frequency}`)
             if (this.count_in_min == this.work && this.sessions_remaining > 1 && this.mode == 1)
             {
                 this.pomodoro_counter++

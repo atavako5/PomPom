@@ -1,7 +1,7 @@
 const {Client, Intents,Constants} = require("discord.js")
 const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 const Pomo = require("./pomo")
-
+process.setMaxListeners(0);
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -179,12 +179,21 @@ client.on('interactionCreate', async (interaction) => {
         })
     } 
     else if (commandName === 'stop'){
-        Pomos[`${interaction.channelId}`].stop()
-        delete Pomos[`${interaction.channelId}`]
-        interaction.reply({
-            content: `Pomodoro Has been canceled`,
-            ephemeral: false,
-        })
+        if (Pomos.hasOwnProperty(`${interaction.channelId}`) === false || Pomos[`${interaction.channelId}`].stopped === true){
+            interaction.reply({
+                content: `You have not started a pomodoro yet, please start a pomodoro by entering /start`,
+                ephemeral: true,
+            }) 
+        }else{
+            Pomos[`${interaction.channelId}`].stop()
+            delete Pomos[`${interaction.channelId}`]
+            interaction.reply({
+                content: `Pomodoro Has been canceled`,
+                ephemeral: false,
+            })
+
+        }
+
     }
     else if (commandName === 'status'){
 
