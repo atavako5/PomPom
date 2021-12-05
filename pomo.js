@@ -213,7 +213,7 @@ sessions remaining until long break: ${this.sessions_remaining}
         this.session_time =  this.dateCreator(this.work)
         this.log(this.session_status)
         this.interval = setInterval(()=>{this.doWork()}, this.tick)
-
+      
         var myobj = { _id: this.channelId, total_pomodoros: 0 };
         this.User.findById(this.channelId, (err,user) => {
             if (err || !user){
@@ -232,6 +232,8 @@ sessions remaining until long break: ${this.sessions_remaining}
                 this.log("User already exists in the DB!")
             }
         })
+
+        this.count = 0 
     }
 
     log(text){
