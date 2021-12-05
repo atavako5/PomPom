@@ -15,6 +15,7 @@ const userSchema = require('./userSchema')
 const mongoose = require('mongoose');
 main().catch(err => logger.info(err));
 
+
 async function main() {
     await mongoose.connect(process.env.MONGO_URL);
 }
