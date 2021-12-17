@@ -300,7 +300,12 @@ sessions remaining until long break: ${this.sessions_remaining}
             }
             this.count++;
         } catch(e){
-            this.log(e)
+            if (e instanceof TypeError){
+                this.stop()
+            }else{
+                this.log(e)
+            }
+            
         }
 
     }
