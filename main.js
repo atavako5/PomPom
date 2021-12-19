@@ -160,6 +160,38 @@ client.on('interactionCreate', async (interaction) => {
             })
             return
         }
+        
+        if (work <= 0 || work > 600 ){
+            interaction.reply({
+                content: `Work can only have values between 1 and 600`,
+                ephemeral: false,
+            })
+            return
+        }
+
+        if (shortbreak <= 0 || shortbreak > 180 ){
+            interaction.reply({
+                content: `ShortBbreak can only have values between 1 and 180`,
+                ephemeral: false,
+            })
+            return
+        }
+
+        if (longbreak <= 0 || longbreak > 600 ){
+            interaction.reply({
+                content: `Shortbreak can only have values between 1 and 600`,
+                ephemeral: false,
+            })
+            return
+        }
+
+        if (sessions <= 0 || sessions > 10 ){
+            interaction.reply({
+                content: `Sessions can only have values between 1 and 10`,
+                ephemeral: false,
+            })
+            return
+        }
        
         if (Pomos.hasOwnProperty(`${interaction.channelId}`) === false)
             Pomos[`${interaction.channelId}`] = new Pomo(
