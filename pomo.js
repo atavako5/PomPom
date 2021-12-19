@@ -218,14 +218,7 @@ sessions remaining until long break: ${this.sessions_remaining}
         this.User.findById(this.channelId, (err,user) => {
             if (err || !user){
                 this.MyUser = new this.User(myobj)
-                this.MyUser.save((err) => {
-                    if (!err){
-                        this.log("User saved in to DB")
-                    }else{
-                        this.log(err)
-                    }
-                    
-                })
+                this.updateDB()
             }else{
                 this.MyUser = user
                 this.total_pomodoros = this.MyUser.total_pomodoros
