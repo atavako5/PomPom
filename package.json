@@ -16,7 +16,7 @@
     "dotenv": "^10.0.0",
     "moment": "^2.29.2",
     "mongodb": "^4.2.0",
-    "mongoose": "^6.0.13",
+    "mongoose": "^6.4.6",
     "pino": "^7.4.1",
     "pino-pretty": "^7.2.0"
   }
